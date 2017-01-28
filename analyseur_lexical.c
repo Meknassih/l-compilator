@@ -342,6 +342,13 @@ int yylex(void)
 		} else
 			erreur("Function identifier must be less than 99 characters");
 	}
+	if (c=='(') { //cas où l'identifier est un seul caractère
+		if (yyleng>0 && yyleng<=101) {
+			delireCar();
+			return ID_FCT;
+		} else
+			erreur("Function identifier must be less than 99 characters");
+	}
 	//NOMBRE
 	if (is_num(c)) {
 		do {
@@ -368,7 +375,9 @@ int yylex(void)
 	else if (c==EOF)
 		erreur_1s("EOF before end of token ", &car);
 }*/
-  erreur_1s("Invalid token",yytext);
+	printf("value : %s\n", yytext);
+	erreur_1s("Invalid token",yytext);
+
 }
 
 /*******************************************************************************
