@@ -2,7 +2,7 @@
 
 #define EPSILON 0
 
-#define NB_NON_TERMINAUX 41
+#define NB_NON_TERMINAUX 42
 
 #define _listeDecVariables_ 1
 #define _listeDecFonctions_ 2
@@ -40,7 +40,6 @@
 #define _optDecVariables_ 34
 #define _optIndice_ 35
 #define _listeDecVariablesBis_ 36
-#define _instructionPour_ 37
 #define _termeBis_ 38
 #define _expressionBis_ 39
 #define _instructionFaire_ 40
@@ -67,9 +66,6 @@
 #define ET 14
 #define OU 15
 #define NON 16
-#define FIN 29
-#define VIRGULE 30
-
 #define SI 17
 #define ALORS 18
 #define SINON 19
@@ -82,3 +78,7 @@
 #define ID_VAR 26
 #define ID_FCT 27
 #define NOMBRE 28
+#define FIN 29
+#define VIRGULE 30
+
+
