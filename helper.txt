@@ -1,0 +1,16 @@
+Non terminaux effaçables
+_optDecVariables_
+_listeDecVariablesBis_
+_optTailleTableau_
+_listeDecFonctions_
+_optListeDecVariables_
+_listeInstructions_
+_optSinon_
+_expressionBis_
+_conjonctionBis_
+_comparaisonBis_
+_expArithBis_
+_termeBis_
+_optIndice_
+_listeExpressions_
+_listeExpressionsBis_
