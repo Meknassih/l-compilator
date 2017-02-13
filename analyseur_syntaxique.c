@@ -392,6 +392,170 @@ void conjB(void) {
   affiche_balise_fermante("conjonctionBis",XML);
 }
 
+void comp(void) {
+  affiche_balise_ouvrante("comparaison",XML);
+  if (est_premier(_expArith_, uniteCourante)) {
+    e(); compB();
+  } else
+    erreur("Erreur de syntaxe");
+  affiche_balise_fermante("comparaison",XML);
+}
+
+void compB(void) {
+  affiche_balise_ouvrante("comparaisonBis",XML);
+  if (uniteCourante == EGAL || uniteCourante == INFERIEUR) {
+    uniteCourante = yylex();
+    if (est_premier(_expArith_, uniteCourante)) {
+      e(); compB();
+    } else {
+      erreur("Expression arithmétique attendue après '=' ou '<'");
+    }
+  } else if (!est_suivant(_comparaisonBis_, uniteCourante)) {
+    erreur("Erreur de syntaxe");
+  }
+  affiche_balise_fermante("comparaisonBis",XML);
+}
+
+void e(void) {
+  affiche_balise_ouvrante("expArith",XML);
+  if (est_premier(_terme_, uniteCourante)) {
+    uniteCourante = yylex();
+    t(); eB();
+  } else {
+    erreur("Erreur de syntaxe");
+  }
+  affiche_balise_fermante("expArith",XML);
+}
+
+void eB(void) {
+  affiche_balise_ouvrante("expArithBis",XML);
+  if (uniteCourante == PLUS || uniteCourante == MOINS) {
+    uniteCourante = yylex();
+    if (est_premier(_terme_, uniteCourante)) {
+      t(); eB();
+    } else {
+      erreur("Terme attendu après '+' ou '-'")
+    }
+  } else if (!est_suivant(_expArithBis_, uniteCourante)) {
+    erreur("Erreur de syntaxe");
+  }
+  affiche_balise_fermante("expArithBis",XML);
+}
+
+void t(void) {
+  affiche_balise_ouvrante("terme",XML);
+  if (est_premier(_negation_, uniteCourante)) {
+    uniteCourante = yylex();
+    neg(); tB();
+  } else {
+    erreur("Erreur de syntaxe");
+  }
+  affiche_balise_fermante("terme",XML);
+}
+
+void tB(void) {
+  affiche_balise_ouvrante("termeBis",XML);
+  if (uniteCourante == FOIS || uniteCourante == DIVISE) {
+    uniteCourante = yylex();
+    if (est_premier(_negation_, uniteCourante)) {
+      neg(); tB();
+    } else {
+      erreur("Terme attendu après '*' ou '/'")
+    }
+  } else if (!est_suivant(_termeBis_, uniteCourante)) {
+    erreur("Erreur de syntaxe");
+  }
+  affiche_balise_fermante("termeBis",XML);
+}
+
+void neg(void) {
+  affiche_balise_ouvrante("negation",XML);
+  if (uniteCourante == NON) {
+    uniteCourante = yylex();
+    if (est_premier(_negation_, uniteCourante)) {
+      neg();
+    } else {
+      erreur("Negation attendue après '!'");
+    }
+  } else if (est_premier(_facteur_, uniteCourante)) {
+    f();
+  } else {
+    erreur("Erreur de syntaxe");
+  }
+  affiche_balise_fermante("negation",XML);
+}
+
+void f(void) {
+  affiche_balise_ouvrante("facteur",XML);
+  if (uniteCourante == PARENTHESE_OUVRANTE) {
+    uniteCourante = yylex();
+    if (est_premier(_expression_, uniteCourante)) {
+      exp();
+      if (uniteCourante == PARENTHESE_FERMANTE) {
+        uniteCourante = yylex();
+      } else {
+        erreur("')' attendue après expression");
+      }
+    } else {
+      erreur("Expression attendue après '('");
+    }
+  } else if (uniteCourante == NOMBRE) {
+    uniteCourante = yylex();
+  } else if (est_premier(_appelFct_, uniteCourante)) {
+    appf();
+  } else if (est_premier(_var_, uniteCourante)) {
+    var();
+  } else if (uniteCourante == LIRE) {
+    uniteCourante = yylex();
+    if (uniteCourante == PARENTHESE_OUVRANTE) {
+      uniteCourante = yylex();
+      if (uniteCourante == PARENTHESE_FERMANTE) {
+        uniteCourante = yylex();
+      } else {
+        erreur("')' attendue après '('");
+      }
+    } else {
+      erreur("'(' attendue après LIRE");
+    }
+  } else {
+    erreur("Erreur de syntaxe");
+  }
+  affiche_balise_fermante("facteur",XML);
+}
+
+void var(void) {
+  affiche_balise_ouvrante("var",XML);
+  if (uniteCourante == ID_VAR) {
+    uniteCourante = yylex();
+    if (est_premier(_optIndice_, uniteCourante)) {
+      oind();
+    } else if (!est_suivant(_var_, uniteCourante)) {
+      erreur("Erreur de syntaxe");
+    }
+  }
+  affiche_balise_fermante("var",XML);
+}
+
+void oind(void) {
+  affiche_balise_ouvrante("optIndice",XML);
+  if (uniteCourante == CROCHET_OUVRANT) {
+    uniteCourante = yylex();
+    if (est_premier(_expression_, uniteCourante)) {
+      exp();
+      if (uniteCourante == CROCHET_FERMANT) {
+        uniteCourante = yylex();
+      } else {
+        erreur("']' attendu après expression");
+      }
+    } else {
+      erreur("Expression attendue après '['");
+    }
+  } else if (!est_suivant(_optIndice_, uniteCourante)) {
+    erreur("Erreur de syntaxe");
+  }
+  affiche_balise_fermante("optIndice",XML);
+}
+
 int main (int argc, char **argv) {
   yyin = fopen(argv[1], "r");
   if (yyin == NULL) {
