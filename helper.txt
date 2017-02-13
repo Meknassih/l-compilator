@@ -1,4 +1,4 @@
-Non terminaux effaÃ§ables
+Non terminaux effaçables
 _optDecVariables_
 _listeDecVariablesBis_
 _optTailleTableau_

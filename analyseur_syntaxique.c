@@ -10,99 +10,37 @@ char yytext[100];
 FILE *yyin;
 char nom[100];
 char valeur[100];
+int const XML = 1;
 
-void E(void) { //Axiome
-  affiche_balise_ouvrante("expArith",1);
-
-  T();
-  Eprime();
-
-  affiche_balise_fermante("expArith",1);
+void pg(void) { //Axiome
+  affiche_balise_ouvrante("programme",XML);
+  if (uniteCourante == ENTIER) {
+    uniteCourante == yylex();
+    odv();
+    ldf();
+  } else if (uniteCourante == ID_FCT) {
+    uniteCourante == yylex();
+    ldf();
+  } else if (uniteCourante == FIN)
+    return;
+  else
+    erreur("Erreur de syntaxe");
+  affiche_balise_fermante("programme",XML);
   return;
 }
 
-void Eprime(void) { //Addition
-  affiche_balise_ouvrante("termeBis",1);
-
-  if (uniteCourante==PLUS) {
-    indent();
-      affiche_xml_texte("+\n");
-
-    uniteCourante=yylex();
-    E();
-
-    affiche_balise_fermante("termeBis",1);
-    return;
-  } else if (uniteCourante==POINT_VIRGULE||uniteCourante==PARENTHESE_FERMANTE||uniteCourante==FOIS||uniteCourante==DIVISE||uniteCourante==MOINS||uniteCourante==FIN) {
-    affiche_balise_fermante("termeBis",1);
-    return;
-  } else {
-    erreur("SYN: Expression ou fin d'expression attendues");
-  }
-}
-
-void T(void) { //Dérive en F ou T'
-  affiche_balise_ouvrante("expArithBis",1);
-
-  F();
-  Tprime();
-
-  affiche_balise_fermante("expArithBisfacteur",1);
-  return;
-}
-
-void Tprime(void) { //Multiplication
-  affiche_balise_ouvrante("facteurBis",1);
-
-  if (uniteCourante==FOIS) {
-    indent();
-      affiche_xml_texte("*\n");
-
-    uniteCourante=yylex();
-    T();
-
-    affiche_balise_fermante("facteurBis",1);
-    return;
-  } else if (uniteCourante==POINT_VIRGULE||uniteCourante==PARENTHESE_FERMANTE||uniteCourante==PLUS||uniteCourante==DIVISE||uniteCourante==MOINS||uniteCourante==FIN) {
-    affiche_balise_fermante("facteurBis",1);
-    return;
-  } else {
-    nom_token( uniteCourante, nom, valeur );
-    printf("SYN: %s\t%s\t%s\n", yytext, nom, valeur);
-    erreur("SYN: Expression ou fin d'expression attendues");
-  }
-}
-
-void F(void) { //Nombre ou expression parenthésée
-  //affiche_balise_ouvrante("expArith",1);
-  if (uniteCourante==PARENTHESE_OUVRANTE) {
-    indent();
-      affiche_xml_texte("(\n");
-
-    uniteCourante=yylex();
-    E();
-    if (uniteCourante==PARENTHESE_FERMANTE) {
-      indent();
-      affiche_xml_texte(")\n");
-      affiche_balise_fermante("expArith",1);
-
-      uniteCourante=yylex();
-      return;
-    } else {
-      erreur("SYN: ')' attendue en fin d'expression");
-    }
-  } else if (uniteCourante==NOMBRE) {
-    indent();
-    affiche_xml_texte(yytext); printf("\n");
-    affiche_balise_fermante("expArith",1);
-
-    uniteCourante=yylex();
-    return;
-  } else {
-    nom_token( uniteCourante, nom, valeur );
-    printf("SYN: %s\t%s\t%s\n", yytext, nom, valeur);
-    erreur("SYN: (expression) ou nombre attendus");
-  }
+void odv(void)  {
+  affiche_balise_ouvrante("optDecVariables",XML);
+  if (uniteCourante == ENTIER) {
+    uniteCourante == yylex();
+    ldv();
+    uniteCourante == yylex();
+    if (uniteCourante != POINT_VIRGULE)
+      erreur("';' manquant");
+    uniteCourante == yylex();
+  } else if (!est_suivant(_optDecVariables_, uniteCourante))
+    erreur("Erreur de syntaxe");
+  affiche_balise_fermante("optDecVariables",XML);
 }
 
 int main (int argc, char **argv) {
@@ -112,7 +50,7 @@ int main (int argc, char **argv) {
     exit(1);
   }
   uniteCourante=yylex();
-  E();
+  pg();
   printf("SYN: Analyse syntaxique terminée avec succès\n");
   return 0;
 }
