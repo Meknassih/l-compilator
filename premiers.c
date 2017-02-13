@@ -67,7 +67,7 @@ void initialise_premiers(void){
   premiers[_conjonction_][ID_FCT] = 1;
   premiers[_conjonction_][ID_VAR] = 1;
   premiers[_conjonction_][LIRE] = 1;
-  premiers[_conjonctionBis_][AND] = 1;
+  premiers[_conjonctionBis_][ET] = 1;
   premiers[_conjonctionBis_][EPSILON] = 1;
   premiers[_comparaison_][NON] = 1;
   premiers[_comparaison_][PARENTHESE_OUVRANTE] = 1;
