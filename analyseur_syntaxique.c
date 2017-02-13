@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "symboles.h"
-#include "util.h"
-#include "analyseur_syntaxique.h"
-#include "analyseur_lexical.h"
+#include "headers/symboles.h"
+#include "headers/util.h"
+#include "headers/analyseur_syntaxique.h"
+#include "headers/analyseur_lexical.h"
 
 short int uniteCourante;
 char yytext[100];

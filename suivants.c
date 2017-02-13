@@ -1,5 +1,5 @@
-#include"symboles.h"
-#include"suivants.h"
+#include"headers/symboles.h"
+#include"headers/suivants.h"
 
 void initialise_suivants(void){
   int i,j;
