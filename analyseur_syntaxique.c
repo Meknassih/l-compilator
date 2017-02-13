@@ -556,6 +556,57 @@ void oind(void) {
   affiche_balise_fermante("optIndice",XML);
 }
 
+void appf(void) {
+  affiche_balise_ouvrante("appelFct",XML);
+  if (uniteCourante == ID_FCT) {
+    uniteCourante = yylex();
+    if (uniteCourante == PARENTHESE_OUVRANTE) {
+      uniteCourante = yylex();
+      if (est_premier(_listeExpressions_, uniteCourante)) {
+        lexp();
+        if (uniteCourante == PARENTHESE_FERMANTE) {
+          uniteCourante = yylex();
+        } else {
+          erreur("')' attendue");
+        }
+      } else {
+        erreur("Erreur de syntaxe");
+      }
+    } else {
+      erreur("'(' attendue");
+    }
+  } else {
+    erreur("Erreur de syntaxe");
+  }
+  affiche_balise_fermante("appelFct",XML);
+}
+
+void lexp(void) {
+  affiche_balise_ouvrante("listeExpressions",XML);
+  if (est_premier(_expression_, uniteCourante)) {
+    exp(); lexpB();
+  } else if(!est_suivant(_listeExpressions_, uniteCourante)) {
+    erreur("Erreur de syntaxe");
+  }
+  affiche_balise_fermante("listeExpressions",XML);
+}
+
+void lexpB(void) {
+  affiche_balise_ouvrante("listeExpressionsBis",XML);
+  if (uniteCourante == VIRGULE) {
+    uniteCourante = yylex();
+    if (est_premier(_expression_, uniteCourante)) {
+      exp(); lexpB();
+    } else {
+      erreur("Expression attendue après ','");
+    }
+  } else if(!est_suivant(_listeExpressionsBis_, uniteCourante)) {
+    erreur("Erreur de syntaxe");
+  }
+
+  affiche_balise_fermante("listeExpressionsBis",XML);
+}
+
 int main (int argc, char **argv) {
   yyin = fopen(argv[1], "r");
   if (yyin == NULL) {
