@@ -4,6 +4,8 @@
 #include "headers/util.h"
 #include "headers/analyseur_syntaxique.h"
 #include "headers/analyseur_lexical.h"
+#include "headers/premiers.h"
+#include "headers/suivants.h"
 
 short int uniteCourante;
 char yytext[100];
@@ -15,11 +17,11 @@ int const XML = 1;
 void pg(void) { //Axiome
   affiche_balise_ouvrante("programme",XML);
   if (uniteCourante == ENTIER) {
-    uniteCourante == yylex();
+    uniteCourante = yylex();
     odv();
     ldf();
   } else if (uniteCourante == ID_FCT) {
-    uniteCourante == yylex();
+    uniteCourante = yylex();
     ldf();
   } else if (uniteCourante == FIN)
     return;
@@ -32,12 +34,12 @@ void pg(void) { //Axiome
 void odv(void)  {
   affiche_balise_ouvrante("optDecVariables",XML);
   if (uniteCourante == ENTIER) {
-    uniteCourante == yylex();
+    uniteCourante = yylex();
     ldv();
     uniteCourante == yylex();
     if (uniteCourante != POINT_VIRGULE)
       erreur("';' manquant");
-    uniteCourante == yylex();
+    uniteCourante = yylex();
   } else if (!est_suivant(_optDecVariables_, uniteCourante))
     erreur("Erreur de syntaxe");
   affiche_balise_fermante("optDecVariables",XML);
@@ -56,7 +58,7 @@ void ldv(void) {
 void ldvb(void) {
   affiche_balise_ouvrante("listeDecVariablesBis",XML);
   if (uniteCourante == VIRGULE) {
-    uniteCourante == yylex();
+    uniteCourante = yylex();
     dv(); ldvb();
   } else if (!est_suivant(_listeDecVariablesBis_, uniteCourante)) {
     erreur("Erreur de syntaxe");
@@ -67,9 +69,9 @@ void ldvb(void) {
 void dv(void) {
   affiche_balise_ouvrante("declarationVariable",XML);
   if (uniteCourante == ENTIER) {
-    uniteCourante == yylex();
+    uniteCourante = yylex();
     if (uniteCourante == ID_VAR) {
-      uniteCourante == yylex();
+      uniteCourante = yylex();
       ott();
     } else {
       erreur("Identifiant de variable attendu après ENTIER");
@@ -83,11 +85,11 @@ void dv(void) {
 void ott(void) {
   affiche_balise_ouvrante("optTailleTableau",XML);
   if (uniteCourante == CROCHET_OUVRANT) {
-    uniteCourante == yylex();
+    uniteCourante = yylex();
     if (uniteCourante == NOMBRE) {
-      uniteCourante == yylex();
+      uniteCourante = yylex();
       if (uniteCourante == CROCHET_FERMANT) {
-        uniteCourante == yylex();
+        uniteCourante = yylex();
       } else
         erreur("Crochet fermant attendu après indice de tableau");
     } else
@@ -244,14 +246,7 @@ void isi(void) {
 
 void osinon(void) {
   affiche_balise_ouvrante("optSinon",XML);
-  if (uniteCourante == SINON) {analyseur_syntaxique.c
-analyseur_syntaxique.c
-analyseur_syntaxique.c
-analyseur_syntaxique.c
-analyseur_syntaxique.c
-analyseur_syntaxique.c
-analyseur_syntaxique.c
-
+  if (uniteCourante == SINON) {
     uniteCourante = yylex();
     ib();
   } else if (!est_suivant(_optSinon_, uniteCourante)) {
@@ -265,10 +260,10 @@ void itq(void) {
   if (uniteCourante == TANTQUE) {
     uniteCourante = yylex();
     exp();
-    if (uniteCourante == FAIRE)
+    if (uniteCourante == FAIRE) {
       uniteCourante = yylex();
       ib();
-    ) else
+    } else
       erreur("FAIRE manquant");
   } else
     erreur("Erreur de syntaxe");
@@ -434,7 +429,7 @@ void eB(void) {
     if (est_premier(_terme_, uniteCourante)) {
       t(); eB();
     } else {
-      erreur("Terme attendu après '+' ou '-'")
+      erreur("Terme attendu après '+' ou '-'");
     }
   } else if (!est_suivant(_expArithBis_, uniteCourante)) {
     erreur("Erreur de syntaxe");
@@ -460,7 +455,7 @@ void tB(void) {
     if (est_premier(_negation_, uniteCourante)) {
       neg(); tB();
     } else {
-      erreur("Terme attendu après '*' ou '/'")
+      erreur("Terme attendu après '*' ou '/'");
     }
   } else if (!est_suivant(_termeBis_, uniteCourante)) {
     erreur("Erreur de syntaxe");
