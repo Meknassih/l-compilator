@@ -1,13 +1,13 @@
 CC=gcc
 CFLAGS=-I. -Wall -pedantic -std=c99
 DEPS=headers/analyseur_lexical.h headers/util.h headers/symboles.h headers/analyseur_syntaxique.h
-OBJ=analyseur_lexical.o analyseur_syntaxique.o test_yylex.o util.o
+OBJ=analyseur_lexical.o analyseur_syntaxique.o test_yylex.o util.o premiers.o suivants.o
 EXE=lex syn
 
 all: lex syn
 
-syn: lex analyseur_syntaxique.o
-	$(CC) -o syn analyseur_lexical.o analyseur_syntaxique.o util.o
+syn: lex analyseur_syntaxique.o premiers.o suivants.o
+	$(CC) -o syn analyseur_lexical.o analyseur_syntaxique.o util.o premiers.o suivants.o
 
 lex: test_yylex.o analyseur_lexical.o util.o
 	$(CC) -o lex test_yylex.o analyseur_lexical.o util.o $(CFLAGS)
@@ -24,6 +24,11 @@ analyseur_syntaxique.o: analyseur_syntaxique.c #$(DEPS)
 util.o: util.c
 	$(CC) $(CFLAGS) -c util.c
 
+premiers.o: premiers.c
+	$(CC) $(CFLAGS) -c premiers.c
+
+suivants.o: suivants.c
+	$(CC) $(CFLAGS) -c suivants.c
 clean:
 	- rm -f $(OBJ)
 	- rm -f $(EXE)
