@@ -16,30 +16,24 @@ int const XML = 1;
 
 void pg(void) { //Axiome
   affiche_balise_ouvrante("programme",XML);
-  if (uniteCourante == ENTIER) {
-    uniteCourante = yylex();
+  if (est_premier(_optDecVariables_, uniteCourante)) {
     odv();
     ldf();
-  } else if (uniteCourante == ID_FCT) {
-    uniteCourante = yylex();
+  } else if (est_premier(_listeDecFonctions_, uniteCourante)) {
     ldf();
-  } else if (uniteCourante == FIN)
-    return;
-  else
+  } else if (!est_suivant(_programme_, uniteCourante)) {
     erreur("Erreur de syntaxe");
+  }
   affiche_balise_fermante("programme",XML);
   return;
 }
 
 void odv(void)  {
   affiche_balise_ouvrante("optDecVariables",XML);
-  if (uniteCourante == ENTIER) {
-    uniteCourante = yylex();
+  if (est_premier(_listeDecVariables_, uniteCourante)) {
     ldv();
-    uniteCourante == yylex();
-    if (uniteCourante != POINT_VIRGULE)
-      erreur("';' manquant");
-    uniteCourante = yylex();
+    if (uniteCourante == POINT_VIRGULE)
+      uniteCourante = yylex();
   } else if (!est_suivant(_optDecVariables_, uniteCourante))
     erreur("Erreur de syntaxe");
   affiche_balise_fermante("optDecVariables",XML);
@@ -47,8 +41,7 @@ void odv(void)  {
 
 void ldv(void) {
   affiche_balise_ouvrante("listeDecVariables",XML);
-  if (uniteCourante == ENTIER) {
-    uniteCourante = yylex();
+  if (est_premier(_declarationVariable_, uniteCourante)) {
     dv(); ldvb();
   } else
     erreur("Erreur de syntaxe");
@@ -59,7 +52,11 @@ void ldvb(void) {
   affiche_balise_ouvrante("listeDecVariablesBis",XML);
   if (uniteCourante == VIRGULE) {
     uniteCourante = yylex();
-    dv(); ldvb();
+    if (est_premier(_declarationVariable_, uniteCourante)) {
+      dv(); ldvb();
+    } else {
+      erreur("Déclaration de variable attendue après ','");
+    }
   } else if (!est_suivant(_listeDecVariablesBis_, uniteCourante)) {
     erreur("Erreur de syntaxe");
   }
@@ -68,11 +65,16 @@ void ldvb(void) {
 
 void dv(void) {
   affiche_balise_ouvrante("declarationVariable",XML);
+  printf("UC=%i yytext=%s valeur=%s\n", uniteCourante, yytext, valeur);
   if (uniteCourante == ENTIER) {
     uniteCourante = yylex();
     if (uniteCourante == ID_VAR) {
       uniteCourante = yylex();
-      ott();
+      if (est_premier(_optTailleTableau_, uniteCourante)) {
+        ott();
+      } else if (!est_suivant(_declarationVariable_, uniteCourante)) {
+        erreur("Erreur de syntaxe : n'est pas suivant");
+      }
     } else {
       erreur("Identifiant de variable attendu après ENTIER");
     }
@@ -102,8 +104,7 @@ void ott(void) {
 
 void ldf(void) {
   affiche_balise_ouvrante("listeDecFonctions",XML);
-  if (uniteCourante == ID_FCT) {
-    uniteCourante = yylex();
+  if (est_premier(_declarationFonction_, uniteCourante)) {
     df(); ldf();
   } else if (!est_suivant(_listeDecFonctions_, uniteCourante)) {
     erreur("Erreur de syntaxe");
@@ -115,7 +116,11 @@ void df(void) {
   affiche_balise_ouvrante("declarationFonction",XML);
   if (uniteCourante == ID_FCT) {
     uniteCourante = yylex();
-    lp(); odv(); ib();
+    if (est_premier(_listeParam_, uniteCourante)) {
+      lp(); odv(); ib();
+    } else {
+      erreur("Liste de paramètres attendus après identifiant de fonction");
+    }
   } else
     erreur("Erreur de syntaxe");
     affiche_balise_fermante("declarationFonction",XML);
@@ -125,7 +130,11 @@ void lp(void) {
   affiche_balise_ouvrante("listeParam",XML);
   if (uniteCourante == PARENTHESE_OUVRANTE) {
     uniteCourante = yylex();
-    oldv();
+    if (est_premier(_optListeDecVariables_, uniteCourante)) {
+      oldv();
+    } else if (!est_suivant(_optListeDecVariables_, uniteCourante)) {
+      erreur("Erreur de syntaxe");
+    }
     if (uniteCourante == PARENTHESE_FERMANTE) {
       uniteCourante = yylex();
     } else
@@ -137,8 +146,7 @@ void lp(void) {
 
 void oldv(void) {
   affiche_balise_ouvrante("optListeDecVariables",XML);
-  if (uniteCourante == ENTIER) {
-    uniteCourante = yylex();
+  if (est_premier(_listeDecVariables_, uniteCourante)) {
     ldv();
   } else if (!est_suivant(_optListeDecVariables_, uniteCourante)) {
     erreur("Erreur de syntaxe");
@@ -148,28 +156,28 @@ void oldv(void) {
 
 void i(void) {
   affiche_balise_ouvrante("instruction",XML);
-  if (uniteCourante == ID_VAR) {
+  if (est_premier(_instructionAffect_, uniteCourante)) {
     uniteCourante = yylex();
     iaff();
-  } else if (uniteCourante == ACCOLADE_OUVRANTE) {
+  } else if (est_premier(_instructionBloc_, uniteCourante)) {
     uniteCourante = yylex();
     ib();
-  } else if (uniteCourante == SI) {
+  } else if (est_premier(_instructionSi_, uniteCourante)) {
     uniteCourante = yylex();
     isi();
-  } else if (uniteCourante == TANTQUE) {
+  } else if (est_premier(_instructionTantque_, uniteCourante)) {
     uniteCourante = yylex();
     itq();
-  } else if (uniteCourante == ID_FCT) {
+  } else if (est_premier(_instructionAppel_, uniteCourante)) {
     uniteCourante = yylex();
     iapp();
-  } else if (uniteCourante == RETOUR) {
+  } else if (est_premier(_instructionRetour_, uniteCourante)) {
     uniteCourante = yylex();
     iret();
-  } else if (uniteCourante == ECRIRE) {
+  } else if (est_premier(_instructionEcriture_, uniteCourante)) {
     uniteCourante = yylex();
     iecr();
-  } else if (uniteCourante == POINT_VIRGULE) {
+  } else if (est_premier(_instructionVide_, uniteCourante)) {
     uniteCourante = yylex();
     ivide();
   } else {
@@ -180,12 +188,15 @@ void i(void) {
 
 void iaff(void) {
   affiche_balise_ouvrante("instructionAffect",XML);
-  if (uniteCourante == ID_VAR) {
-    uniteCourante = yylex();
+  if (est_premier(_var_, uniteCourante)) {
     var();
     if (uniteCourante == EGAL) {
       uniteCourante = yylex();
-      exp();
+      if (est_premier(_expression_, uniteCourante)) {
+        Exp();
+      } else {
+        erreur("Expression attendue après '='");
+      }
       if (uniteCourante == POINT_VIRGULE) {
         uniteCourante = yylex();
       } else
@@ -203,7 +214,11 @@ void ib(void) {
   affiche_balise_ouvrante("instructionBloc",XML);
   if (uniteCourante == ACCOLADE_OUVRANTE) {
     uniteCourante = yylex();
-    li();
+    if (est_premier(_listeInstructions_, uniteCourante)) {
+      li();
+    } else {
+      erreur("Erreur de syntaxe");
+    }
     if (uniteCourante == ACCOLADE_FERMANTE) {
       uniteCourante = yylex();
     } else {
@@ -217,7 +232,7 @@ void ib(void) {
 
 void li(void) {
   affiche_balise_ouvrante("listeInstructions",XML);
-  if (uniteCourante == ID_VAR || uniteCourante == ACCOLADE_OUVRANTE || uniteCourante == SI || uniteCourante == TANTQUE || uniteCourante == ID_FCT || uniteCourante == RETOUR || uniteCourante == ECRIRE || uniteCourante == POINT_VIRGULE) {
+  if (est_premier(_instruction_, uniteCourante)) {
     i(); li();
   } else if (!est_suivant(_listeInstructions_, uniteCourante)) {
     erreur("Erreur de syntaxe");
@@ -230,7 +245,7 @@ void isi(void) {
   if (uniteCourante == SI) {
     uniteCourante = yylex();
     if (est_premier(_expression_, uniteCourante)) { //?
-      exp();
+      Exp();
       if (uniteCourante == ALORS) {
         uniteCourante = yylex();
         ib(); osinon();
@@ -259,7 +274,7 @@ void itq(void) {
   affiche_balise_ouvrante("instructionTantque",XML);
   if (uniteCourante == TANTQUE) {
     uniteCourante = yylex();
-    exp();
+    Exp();
     if (uniteCourante == FAIRE) {
       uniteCourante = yylex();
       ib();
@@ -290,7 +305,7 @@ void iret(void) {
   if (uniteCourante == RETOUR) {
     uniteCourante = yylex();
     if (est_premier(_expression_, uniteCourante)) {
-      exp();
+      Exp();
       if (uniteCourante == POINT_VIRGULE) {
         uniteCourante = yylex();
       } else {
@@ -310,7 +325,7 @@ void iecr(void) {
     if (uniteCourante == PARENTHESE_OUVRANTE) {
       uniteCourante = yylex();
       if (est_premier(_expression_, uniteCourante)) {
-        exp();
+        Exp();
         if (uniteCourante == PARENTHESE_FERMANTE) {
           uniteCourante = yylex();
           if (uniteCourante == POINT_VIRGULE) {
@@ -339,10 +354,10 @@ void ivide(void) {
   affiche_balise_fermante("instructionVide",XML);
 }
 
-void exp(void) {
+void Exp(void) {
   affiche_balise_ouvrante("expression",XML);
   if (est_premier(_conjonction_, uniteCourante)) {
-    conj(); expB();
+    Conj(); expB();
   } else
     erreur("Erreur de syntaxe");
   affiche_balise_fermante("expression",XML);
@@ -353,7 +368,7 @@ void expB(void) {
   if (uniteCourante == OU) {
     uniteCourante = yylex();
     if (est_premier(_conjonction_, uniteCourante)) {
-      conj(); expB();
+      Conj(); expB();
     } else {
       erreur("Conjonction attendue après '|'");
     }
@@ -363,7 +378,7 @@ void expB(void) {
   affiche_balise_fermante("expressionBis",XML);
 }
 
-void conj(void) {
+void Conj(void) {
   affiche_balise_ouvrante("conjonction",XML);
   if (est_premier(_comparaison_, uniteCourante)) {
     comp(); conjB();
@@ -485,7 +500,7 @@ void f(void) {
   if (uniteCourante == PARENTHESE_OUVRANTE) {
     uniteCourante = yylex();
     if (est_premier(_expression_, uniteCourante)) {
-      exp();
+      Exp();
       if (uniteCourante == PARENTHESE_FERMANTE) {
         uniteCourante = yylex();
       } else {
@@ -536,7 +551,7 @@ void oind(void) {
   if (uniteCourante == CROCHET_OUVRANT) {
     uniteCourante = yylex();
     if (est_premier(_expression_, uniteCourante)) {
-      exp();
+      Exp();
       if (uniteCourante == CROCHET_FERMANT) {
         uniteCourante = yylex();
       } else {
@@ -579,7 +594,7 @@ void appf(void) {
 void lexp(void) {
   affiche_balise_ouvrante("listeExpressions",XML);
   if (est_premier(_expression_, uniteCourante)) {
-    exp(); lexpB();
+    Exp(); lexpB();
   } else if(!est_suivant(_listeExpressions_, uniteCourante)) {
     erreur("Erreur de syntaxe");
   }
@@ -591,7 +606,7 @@ void lexpB(void) {
   if (uniteCourante == VIRGULE) {
     uniteCourante = yylex();
     if (est_premier(_expression_, uniteCourante)) {
-      exp(); lexpB();
+      Exp(); lexpB();
     } else {
       erreur("Expression attendue après ','");
     }
@@ -603,11 +618,24 @@ void lexpB(void) {
 }
 
 int main (int argc, char **argv) {
+  int i,j;
+
   yyin = fopen(argv[1], "r");
   if (yyin == NULL) {
     fprintf(stderr, "Impossible d'ouvrir le fichier %s\n", argv[1]);
     exit(1);
   }
+  initialise_premiers();
+  initialise_suivants();
+
+  printf("suivant(%i, %i)?%i\n",_declarationVariable_, VIRGULE, est_suivant(_declarationVariable_, VIRGULE));
+  for(i=0; i <= NB_NON_TERMINAUX; i++) {
+    for(j=0; j <= NB_TERMINAUX; j++)
+      printf("%i ",suivants[i][j]);
+    printf("\n");
+  }
+
+
   uniteCourante=yylex();
   pg();
   printf("SYN: Analyse syntaxique terminée avec succès\n");

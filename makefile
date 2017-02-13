@@ -10,7 +10,7 @@ syn: lex analyseur_syntaxique.o premiers.o suivants.o
 	$(CC) -o syn analyseur_lexical.o analyseur_syntaxique.o util.o premiers.o suivants.o
 
 lex: test_yylex.o analyseur_lexical.o util.o
-	$(CC) -o lex test_yylex.o analyseur_lexical.o util.o $(CFLAGS)
+	$(CC) -c test_yylex.o analyseur_lexical.o util.o $(CFLAGS)
 
 test_yylex.o: test_yylex.c #$(DEPS)
 	$(CC) $(CFLAGS) -c test_yylex.c
