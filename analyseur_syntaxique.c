@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "headers/symboles.h"
 #include "headers/util.h"
 #include "headers/analyseur_syntaxique.h"
@@ -12,13 +13,12 @@ char yytext[100];
 FILE *yyin;
 char nom[100];
 char valeur[100];
-int const XML = 1;
+int XML = 0;
 
 void pg(void) { //Axiome
   affiche_balise_ouvrante("programme",XML);
   if (est_premier(_optDecVariables_, uniteCourante)) {
-    odv();
-    ldf();
+    odv(); ldf();
   } else if (est_premier(_listeDecFonctions_, uniteCourante)) {
     ldf();
   } else if (!est_suivant(_programme_, uniteCourante)) {
@@ -57,7 +57,7 @@ void ldvb(void) {
     } else {
       erreur("Déclaration de variable attendue après ','");
     }
-  } else if (!est_suivant(_listeDecVariablesBis_, uniteCourante)) {
+  } else if (est_suivant(_listeDecVariablesBis_, uniteCourante)) {
     erreur("Erreur de syntaxe");
   }
   affiche_balise_fermante("listeDecVariablesBis",XML);
@@ -65,7 +65,6 @@ void ldvb(void) {
 
 void dv(void) {
   affiche_balise_ouvrante("declarationVariable",XML);
-  printf("UC=%i yytext=%s valeur=%s\n", uniteCourante, yytext, valeur);
   if (uniteCourante == ENTIER) {
     uniteCourante = yylex();
     if (uniteCourante == ID_VAR) {
@@ -157,28 +156,20 @@ void oldv(void) {
 void i(void) {
   affiche_balise_ouvrante("instruction",XML);
   if (est_premier(_instructionAffect_, uniteCourante)) {
-    uniteCourante = yylex();
     iaff();
   } else if (est_premier(_instructionBloc_, uniteCourante)) {
-    uniteCourante = yylex();
     ib();
   } else if (est_premier(_instructionSi_, uniteCourante)) {
-    uniteCourante = yylex();
     isi();
   } else if (est_premier(_instructionTantque_, uniteCourante)) {
-    uniteCourante = yylex();
     itq();
   } else if (est_premier(_instructionAppel_, uniteCourante)) {
-    uniteCourante = yylex();
     iapp();
   } else if (est_premier(_instructionRetour_, uniteCourante)) {
-    uniteCourante = yylex();
     iret();
   } else if (est_premier(_instructionEcriture_, uniteCourante)) {
-    uniteCourante = yylex();
     iecr();
   } else if (est_premier(_instructionVide_, uniteCourante)) {
-    uniteCourante = yylex();
     ivide();
   } else {
     erreur("Erreur de syntaxe");
@@ -335,7 +326,7 @@ void iecr(void) {
         } else
           erreur("')' manquant");
       } else
-        erreur("Erreur de syntaxe");
+        erreur("Erreur de syntaxe : expression attendue");
     } else
       erreur("'(' manquant");
   } else
@@ -429,7 +420,6 @@ void compB(void) {
 void e(void) {
   affiche_balise_ouvrante("expArith",XML);
   if (est_premier(_terme_, uniteCourante)) {
-    uniteCourante = yylex();
     t(); eB();
   } else {
     erreur("Erreur de syntaxe");
@@ -455,7 +445,6 @@ void eB(void) {
 void t(void) {
   affiche_balise_ouvrante("terme",XML);
   if (est_premier(_negation_, uniteCourante)) {
-    uniteCourante = yylex();
     neg(); tB();
   } else {
     erreur("Erreur de syntaxe");
@@ -618,9 +607,33 @@ void lexpB(void) {
 }
 
 int main (int argc, char **argv) {
-  int i,j;
+  int op1 = 0;
+  if (argc > 2) {
+    op1 = 1;
+    if (strcmp(argv[1],"-l") == 0) {
+      yyin = fopen(argv[2], "r");
+      if (yyin == NULL) {
+        fprintf(stderr, "Impossible d'ouvrir le fichier %s\n", argv[2]);
+        exit(1);
+      }
+      test_yylex_internal(yyin);
+      return 0;
+    } else if (strcmp(argv[1],"-x") == 0) {
+      XML = 1;
+    } else if (strcmp(argv[1],"-s") == 0) {
 
-  yyin = fopen(argv[1], "r");
+    } else {
+      fprintf(stderr, "Arguments incorrects\n");
+      exit(1);
+    }
+  }
+
+  if (op1) {
+    yyin = fopen(argv[2], "r");
+  } else {
+    yyin = fopen(argv[1], "r");
+  }
+
   if (yyin == NULL) {
     fprintf(stderr, "Impossible d'ouvrir le fichier %s\n", argv[1]);
     exit(1);
@@ -628,16 +641,9 @@ int main (int argc, char **argv) {
   initialise_premiers();
   initialise_suivants();
 
-  printf("suivant(%i, %i)?%i\n",_declarationVariable_, VIRGULE, est_suivant(_declarationVariable_, VIRGULE));
-  for(i=0; i <= NB_NON_TERMINAUX; i++) {
-    for(j=0; j <= NB_TERMINAUX; j++)
-      printf("%i ",suivants[i][j]);
-    printf("\n");
-  }
-
-
   uniteCourante=yylex();
   pg();
   printf("SYN: Analyse syntaxique terminée avec succès\n");
+
   return 0;
 }

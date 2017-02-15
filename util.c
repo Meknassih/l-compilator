@@ -3,9 +3,9 @@
 #include <string.h>
 #include "headers/util.h"
 
-extern short int uniteCourante;
-extern char yytext[100];
-extern char valeur[100];
+//extern short int uniteCourante;
+//extern char yytext[100];
+//extern char valeur[100];
 
 /*-------------------------------------------------------------------------*/
 
@@ -18,7 +18,7 @@ int indent_step = 1; /* set to 0 for no indentation */
 void erreur(char *message) {
   fprintf (stderr, "Ligne %d : ", nb_ligne);
   fprintf (stderr, "%s\n", message);
-  fprintf(stderr, "UC=%i yytext=%s valeur=%s\n", uniteCourante, yytext, valeur);
+  //fprintf(stderr, "UC=%i yytext=%s valeur=%s\n", uniteCourante, yytext, valeur);
   exit(1);
 }
 

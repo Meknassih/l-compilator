@@ -76,257 +76,6 @@ void delireCar()
 }
 
 /*******************************************************************************
- * Fonction auxiliaire à yylex permettant de détecter les symboles à plusieurs
- * caractères (mot-clefs, instructions de controle,...)
- ******************************************************************************/
-int lireMotclef(void) { //FINIR else DELIRECAR() COMME entier / FINIR GESTION ERR APR tantque
-  char c;
-  int i;
-
-  c = lireCar();
-  //------------SI + SINON
-  if (c=='s') {
-    c = lireCar();
-    if (c=='i') {
-      c = lireCar();
-      if (c==' ' || c=='(') {
-        delireCar();
-        return SI;
-      } else if (c=='n') {
-        c = lireCar();
-        if (c=='o') {
-          c=lireCar();
-          if (c=='n') {
-            c=lireCar();
-            if (c==' ' || c=='(' || c=='\n') {
-              delireCar();
-              return SINON;
-            } else if (!is_alphanum(c)) {
-	      erreur("LEX: ' ', '(' ou retour attendu après 'sinon'");
-	    }
-          }
-        }
-      } else if (!is_alphanum(c)) {
-	erreur("LEX: ' ' ou '(' attendu après 'si'");
-      }
-    }
-  }
-
-  //------------ALORS
-  if (c=='a') {
-    c = lireCar();
-    if (c=='l') {
-      c = lireCar();
-      if (c=='o') {
-        c = lireCar();
-        if (c=='r') {
-          c = lireCar();
-          if (c=='s') {
-            c = lireCar();
-            if (c==' ' || c=='{' || c=='\n') {
-              delireCar();
-              return ALORS;
-            } else if (!is_alphanum(c)) {
-	      erreur("LEX: ' ', '{' ou retour attendu après 'alors'");
-	    }
-          }
-        }
-      }
-    }
-  }
-
-  //------------TANTQUE
-  if (c=='t') {
-    c = lireCar();
-    if (c=='a') {
-      c = lireCar();
-      if (c=='n') {
-        c = lireCar();
-        if (c=='t') {
-          c = lireCar();
-          if (c=='q') {
-            c = lireCar();
-            if (c=='u') {
-              c = lireCar();
-              if (c=='e') {
-                c = lireCar();
-                if (c==' ' || c=='(') {
-                  delireCar();
-                  return TANTQUE;
-                } else if (!is_alphanum(c)) {
-		  erreur("LEX: ' ' ou '(' attendu après 'tantque'");
-		}
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  //------------FAIRE
-  if (c=='f') {
-    c = lireCar();
-    if (c=='a') {
-      c = lireCar();
-      if (c=='i') {
-        c = lireCar();
-        if (c=='r') {
-          c = lireCar();
-          if (c=='e') {
-            c = lireCar();
-            if (c==' ' || c=='{' || c=='\n') {
-              delireCar();
-              return FAIRE;
-            } else if (!is_alphanum(c)) {
-	      erreur("LEX: ' ', '{' ou retour attendu après 'faire'");
-	    }
-          }
-        }
-      }
-    }
-  }
-
-  //------------ENTIER
-  if (c=='e') {
-    c = lireCar();
-    if (c=='n') {
-      c = lireCar();
-      if (c=='t') {
-        c = lireCar();
-        if (c=='i') {
-          c = lireCar();
-          if (c=='e') {
-            c = lireCar();
-            if (c=='r') {
-              c = lireCar();
-              if (c==' ') {
-                delireCar();
-                return ENTIER;
-              } else if (!is_alphanum(c)) {
-		erreur("LEX: ' ' attendu après 'entier'");
-	      } else {
-		for (i=0;i<7;i++)
-		  delireCar();
-		c = lireCar();
-	      }
-            } else {
-	      for (i=0;i<6;i++)
-		delireCar();
-	      c = lireCar();
-	    }
-          } else {
-	    for (i=0;i<5;i++)
-	      delireCar();
-	    c = lireCar();
-	  }
-        } else {
-	  for (i=0;i<4;i++)
-	    delireCar();
-	  c = lireCar();
-	}
-      } else {
-	for (i=0;i<3;i++)
-	  delireCar();
-	c = lireCar();
-      }
-    } else {
-      for (i=0;i<2;i++)
-	delireCar();
-      c = lireCar();
-    }
-  }
-
-  //------------ECRIRE
-  if (c=='e') {
-    c = lireCar();
-    if (c=='c') {
-      c = lireCar();
-      if (c=='r') {
-        c = lireCar();
-        if (c=='i') {
-          c = lireCar();
-          if (c=='r') {
-            c = lireCar();
-            if (c=='e') {
-              c = lireCar();
-              if (c==' ' || c=='(') {
-                delireCar();
-                return ECRIRE;
-              } else if (!is_alphanum(c)) {
-		erreur("LEX: ' ' ou '(' attendu après 'ecrire'");
-	      }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  //------------LIRE
-  if (c=='l') {
-    c = lireCar();
-    if (c=='i') {
-      c = lireCar();
-      if (c=='r') {
-        c = lireCar();
-        if (c=='e') {
-          c = lireCar();
-          if (c==' ' || c=='(') {
-            delireCar();
-            return LIRE;
-          } else if (!is_alphanum(c)) {
-	    erreur("LEX: ' ' ou '(' attendu après 'lire'");
-	  }
-        }
-      }
-    }
-  }
-
-  //------------NOMBRE
-  if (is_num(c)) {
-    while (is_num(c)) {
-      i++;
-      c = lireCar();
-    }
-    if (is_alphanum(c)) {
-      erreur("LEX: symbole non reconnu (une fonction ne peut pas commencer par un numéro)");
-    }
-    delireCar();
-    return NOMBRE;
-  }
-
-  //------------ID_VAR
-  if (c=='$') {
-    while (is_alphanum(c)) {
-        i++;
-        c = lireCar();
-    }
-    delireCar();
-    return ID_VAR;
-  }
-
-  //------------ID_FCT
-  if (isalpha(c) || c=='_') {
-    while (is_alphanum(c)) {
-      i++;
-      c = lireCar();
-    }
-    delireCar();
-    return ID_FCT;
-  }
-
-  //------------FIN
-  if (feof(yyin)) {
-    return FIN;
-  }
-
-  //------------aucun
-  erreur("Symbole non reconnu");
-  return -1;
-}
-
-/*******************************************************************************
  * Fonction principale de l'analyseur lexical, lit les caractères de yyin et
  * renvoie les tokens sous forme d'entier. Le code de chaque unité est défini
  * dans symboles.h sinon (mot clé, idententifiant, etc.). Pour les tokens de
@@ -336,68 +85,282 @@ int lireMotclef(void) { //FINIR else DELIRECAR() COMME entier / FINIR GESTION ER
 int yylex(void)
 {
   char c;
-  yytext[yyleng = 0] = '\0';
-  mangeEspaces();
-  c = lireCar();
-  switch (c) {
-  case ';':
-    return POINT_VIRGULE;
-    break;
-  case '+':
-    return PLUS;
-    break;
-  case '-':
-    return MOINS;
-    break;
-  case '*':
-    return FOIS;
-    break;
-  case '/':
-    return DIVISE;
-    break;
-  case '(':
-    return PARENTHESE_OUVRANTE;
-    break;
-  case ')':
-    return PARENTHESE_FERMANTE;
-    break;
-  case '[':
-    return CROCHET_OUVRANT;
-    break;
-  case ']':
-    return CROCHET_FERMANT;
-    break;
-  case '{':
-    return ACCOLADE_OUVRANTE;
-    break;
-  case '}':
-    return ACCOLADE_FERMANTE;
-    break;
-  case '=':
-    return EGAL;
-    break;
-  case '<':
-    return INFERIEUR;
-    break;
-  case '&':
-    return ET;
-    break;
-  case '|':
-    return OU;
-    break;
-  case '!':
-    return NON;
-    break;
-  case ',':
-    return VIRGULE;
-    break;
-  case '\n':
-    return RETOUR;
-    break;
-  default:
-    delireCar();
-    return lireMotclef();
-  }
+	int i;
+	yytext[yyleng = 0] = '\0';
+	mangeEspaces();
+	c = lireCar();
+
+	//Reconnaissance symboles simples
+	if (c==';')
+		return POINT_VIRGULE;
+	else if (c=='+')
+		return PLUS;
+	else if (c=='-')
+		return MOINS;
+	else if (c=='*')
+		return FOIS;
+	else if (c=='/')
+		return DIVISE;
+	else if (c=='(')
+		return PARENTHESE_OUVRANTE;
+	else if (c==')')
+		return PARENTHESE_FERMANTE;
+	else if (c=='[')
+		return CROCHET_OUVRANT;
+	else if (c==']')
+		return CROCHET_FERMANT;
+	else if (c=='{')
+		return ACCOLADE_OUVRANTE;
+	else if (c=='}')
+		return ACCOLADE_FERMANTE;
+	else if (c=='=')
+		return EGAL;
+	else if (c=='<')
+		return INFERIEUR;
+	else if (c=='&')
+		return ET;
+	else if (c=='|')
+		return OU;
+	else if (c=='!')
+		return NON;
+	else if (c==',')
+		return VIRGULE;
+	else if (c==EOF)
+		return FIN;
+
+	//Reconnaissance mots-clefs
+	//SI SINON
+	if (c=='s') {
+		c = lireCar();
+		if (c=='i') {
+			c = lireCar();
+			if (c==' ') {
+				delireCar();
+				return SI;
+			} else if (c=='n'){
+				c = lireCar();
+				if (c=='o') {
+					c = lireCar();
+					if (c=='n') {
+						c = lireCar();
+						if (!is_alphanum(c)) {
+							delireCar();
+							return SINON;
+						}
+					}
+				}
+			}
+		}
+	}
+	//ALORS
+	if (c=='a') {
+		c = lireCar();
+		if (c=='l') {
+			c = lireCar();
+			if (c=='o') {
+				c = lireCar();
+				if (c=='r'){
+					c = lireCar();
+					if (c=='s') {
+						c = lireCar();
+						if (!is_alphanum(c)) {
+							delireCar();
+							return ALORS;
+						}
+					}
+				}
+			}
+		}
+	}
+	//TANTQUE
+	if (c=='t') {
+		c = lireCar();
+		if (c=='a') {
+			c = lireCar();
+			if (c=='n') {
+				c = lireCar();
+				if (c=='t'){
+					c = lireCar();
+					if (c=='q') {
+						c = lireCar();
+						if (c=='u') {
+							c = lireCar();
+							if (c=='e') {
+								c = lireCar();
+								if (c==' ') {
+									delireCar();
+									return TANTQUE;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	//FAIRE
+	if (c=='f') {
+		c = lireCar();
+		if (c=='a') {
+			c = lireCar();
+			if (c=='i') {
+				c = lireCar();
+				if (c=='r'){
+					c = lireCar();
+					if (c=='e') {
+						c = lireCar();
+						if (!is_alphanum(c)) {
+							delireCar();
+							return FAIRE;
+						}
+					}
+				}
+			}
+		}
+	}
+	//ENTIER ECRIRE
+	if (c=='e') {
+		c = lireCar();
+		if (c=='n') {
+			c = lireCar();
+			if (c=='t') {
+				c = lireCar();
+				if (c=='i'){
+					c = lireCar();
+					if (c=='e') {
+						c = lireCar();
+						if (c=='r') {
+							c = lireCar();
+							if (c==' ') {
+								delireCar();
+								return ENTIER;
+							}
+						}
+					}
+				}
+			}
+		} else if (c=='c') {
+			c = lireCar();
+			if (c=='r') {
+				 c = lireCar();
+				if (c=='i'){
+					c = lireCar();
+					if (c=='r') {
+						c = lireCar();
+						if (c=='e') {
+							c = lireCar();
+							if (c=='(') {
+								delireCar();
+								return ECRIRE;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	//RETOUR
+	if (c=='r') {
+		c = lireCar();
+		if (c=='e') {
+			c = lireCar();
+			if (c=='t') {
+				c = lireCar();
+				if (c=='o'){
+					c = lireCar();
+					if (c=='u') {
+						c = lireCar();
+						if (c=='r') {
+							c = lireCar();
+							if (c==' ' || ';') {
+								delireCar();
+								return RETOUR;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	//LIRE
+	if (c=='l') {
+		c = lireCar();
+		if (c=='i') {
+			c = lireCar();
+			if (c=='r') {
+				c = lireCar();
+				if (c=='e'){
+					c = lireCar();
+					if (c=='(') {
+            delireCar();
+						return LIRE;
+					}
+				}
+			}
+		}
+	}
+	//ID_VAR
+	if (c=='$') {
+		do {
+			c = lireCar();
+			i++;
+		} while (is_alphanum(c));
+
+		if (yyleng>1) {
+			delireCar();
+			return ID_VAR;
+		}
+		else
+			erreur("Variable identifier must be at least 1 character long");
+	}
+	//ID_FCT
+	if (is_maj(c) || is_min(c)) {
+		do {
+			c = lireCar();
+		} while (is_alphanum(c));
+
+		if (yyleng<=101) { //+1 pour '\0' et +1 pour le dernier caractère qu'on va délire de suite
+			delireCar();
+			return ID_FCT;
+		} else
+			erreur("Function identifier must be less than 99 characters");
+	}
+	if (c=='(') { //cas où l'identifier est un seul caractère
+		if (yyleng>0 && yyleng<=101) {
+			delireCar();
+			return ID_FCT;
+		} else
+			erreur("Function identifier must be less than 99 characters");
+	}
+	//NOMBRE
+	if (is_num(c)) {
+		do {
+			c = lireCar();
+		} while (is_num(c));
+
+		if (is_alphanum(c))
+			erreur("An identifier cannot start with a number");
+		else {
+			delireCar();
+			return NOMBRE;
+		}
+	}
+
+/*else {
+	do {
+		c = lireCar();
+	} while (c!='(' && c!='=' && c!=EOF);
+
+	if (c=='(')
+		return ID_FCT;
+	else if (c=='=')
+		return ID_VAR;
+	else if (c==EOF)
+		erreur_1s("EOF before end of token ", &car);
+}*/
+	printf("value : %s\n", yytext);
+	erreur_1s("Invalid token",yytext);
+  return -1;
 }
 
 /*******************************************************************************

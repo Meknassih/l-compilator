@@ -4,7 +4,7 @@
 void initialise_suivants(void){
   int i,j;
 
-  // Initialiser toutes les cases du tableau Ã  0
+  // Initialiser toutes les cases du tableau ï¿½  0
   for(i=0; i <= NB_NON_TERMINAUX; i++)
     for(j=0; j <= NB_TERMINAUX; j++)
       suivants[i][j] = 0;
@@ -17,6 +17,7 @@ void initialise_suivants(void){
   suivants[_listeDecVariables_][POINT_VIRGULE] = 1;
   suivants[_declarationVariable_][VIRGULE] = 1;
   suivants[_declarationVariable_][POINT_VIRGULE] = 1;
+  suivants[_declarationVariable_][PARENTHESE_FERMANTE] = 1;
   suivants[_optTailleTableau_][VIRGULE] = 1;
   suivants[_optTailleTableau_][POINT_VIRGULE] = 1;
   suivants[_declarationFonction_][ID_FCT] = 1;
@@ -119,14 +120,18 @@ void initialise_suivants(void){
   suivants[_conjonction_][OU] = 1;
   suivants[_conjonction_][PARENTHESE_FERMANTE] = 1;
   suivants[_conjonction_][ALORS] = 1;
+  suivants[_conjonction_][FAIRE] = 1;
   suivants[_conjonction_][POINT_VIRGULE] = 1;
   suivants[_expressionBis_][PARENTHESE_FERMANTE] = 1;
   suivants[_expressionBis_][ALORS] = 1;
+  suivants[_expressionBis_][FAIRE] = 1;
   suivants[_expressionBis_][POINT_VIRGULE] = 1;
+  suivants[_expressionBis_][VIRGULE] = 1; //?
   suivants[_comparaison_][ET] = 1;
   suivants[_comparaison_][OU] = 1;
   suivants[_comparaison_][PARENTHESE_FERMANTE] = 1;
   suivants[_comparaison_][ALORS] = 1;
+  suivants[_comparaison_][FAIRE] = 1;
   suivants[_comparaison_][POINT_VIRGULE] = 1;
   suivants[_expArith_][EGAL] = 1;
   suivants[_expArith_][INFERIEUR] = 1;
@@ -134,12 +139,15 @@ void initialise_suivants(void){
   suivants[_expArith_][OU] = 1;
   suivants[_expArith_][PARENTHESE_FERMANTE] = 1;
   suivants[_expArith_][ALORS] = 1;
+  suivants[_expArith_][FAIRE] = 1;
   suivants[_expArith_][POINT_VIRGULE] = 1;
   suivants[_comparaisonBis_][ET] = 1;
   suivants[_comparaisonBis_][OU] = 1;
   suivants[_comparaisonBis_][PARENTHESE_FERMANTE] = 1;
   suivants[_comparaisonBis_][ALORS] = 1;
+  suivants[_comparaisonBis_][FAIRE] = 1;
   suivants[_comparaisonBis_][POINT_VIRGULE] = 1;
+  suivants[_comparaisonBis_][VIRGULE] = 1; //?
   suivants[_terme_][PLUS] = 1;
   suivants[_terme_][MOINS] = 1;
   suivants[_terme_][EGAL] = 1;
@@ -148,6 +156,7 @@ void initialise_suivants(void){
   suivants[_terme_][OU] = 1;
   suivants[_terme_][PARENTHESE_FERMANTE] = 1;
   suivants[_terme_][ALORS] = 1;
+  suivants[_terme_][FAIRE] = 1;
   suivants[_terme_][POINT_VIRGULE] = 1;
   suivants[_expArithBis_][EGAL] = 1;
   suivants[_expArithBis_][INFERIEUR] = 1;
@@ -155,7 +164,9 @@ void initialise_suivants(void){
   suivants[_expArithBis_][OU] = 1;
   suivants[_expArithBis_][PARENTHESE_FERMANTE] = 1;
   suivants[_expArithBis_][ALORS] = 1;
+  suivants[_expArithBis_][FAIRE] = 1;
   suivants[_expArithBis_][POINT_VIRGULE] = 1;
+  suivants[_expArithBis_][VIRGULE] = 1; //?
   suivants[_negation_][FOIS] = 1;
   suivants[_negation_][DIVISE] = 1;
   suivants[_negation_][PLUS] = 1;
@@ -166,6 +177,7 @@ void initialise_suivants(void){
   suivants[_negation_][OU] = 1;
   suivants[_negation_][PARENTHESE_FERMANTE] = 1;
   suivants[_negation_][ALORS] = 1;
+  suivants[_negation_][FAIRE] = 1;
   suivants[_negation_][POINT_VIRGULE] = 1;
   suivants[_termeBis_][PLUS] = 1;
   suivants[_termeBis_][MOINS] = 1;
@@ -175,7 +187,9 @@ void initialise_suivants(void){
   suivants[_termeBis_][OU] = 1;
   suivants[_termeBis_][PARENTHESE_FERMANTE] = 1;
   suivants[_termeBis_][ALORS] = 1;
+  suivants[_termeBis_][FAIRE] = 1;
   suivants[_termeBis_][POINT_VIRGULE] = 1;
+  suivants[_termeBis_][VIRGULE] = 1; //?
   suivants[_facteur_][FOIS] = 1;
   suivants[_facteur_][DIVISE] = 1;
   suivants[_facteur_][PLUS] = 1;
@@ -186,6 +200,7 @@ void initialise_suivants(void){
   suivants[_facteur_][OU] = 1;
   suivants[_facteur_][PARENTHESE_FERMANTE] = 1;
   suivants[_facteur_][ALORS] = 1;
+  suivants[_facteur_][FAIRE] = 1;
   suivants[_facteur_][POINT_VIRGULE] = 1;
   suivants[_appelFct_][FOIS] = 1;
   suivants[_appelFct_][DIVISE] = 1;
@@ -209,6 +224,7 @@ void initialise_suivants(void){
   suivants[_var_][PARENTHESE_FERMANTE] = 1;
   suivants[_var_][ALORS] = 1;
   suivants[_var_][POINT_VIRGULE] = 1;
+  suivants[_var_][VIRGULE] = 1;
   suivants[_optIndice_][FOIS] = 1;
   suivants[_optIndice_][DIVISE] = 1;
   suivants[_optIndice_][PLUS] = 1;
@@ -221,11 +237,13 @@ void initialise_suivants(void){
   suivants[_optIndice_][ALORS] = 1;
   suivants[_optIndice_][POINT_VIRGULE] = 1;
   suivants[_expression_][CROCHET_FERMANT] = 1;
+  suivants[_expression_][FAIRE] = 1;
   suivants[_listeExpressions_][PARENTHESE_FERMANTE] = 1;
+  suivants[_listeExpressionsBis_][PARENTHESE_FERMANTE] = 1;
   suivants[_expression_][VIRGULE] = 1;
 }
 
-int est_suivant(int terminal, int non_terminal)
+int est_suivant(int non_terminal, int terminal)
 {
   return suivants[non_terminal][terminal];
 }
