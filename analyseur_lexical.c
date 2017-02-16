@@ -16,7 +16,7 @@
 extern FILE *yyin;
 
 char *tableMotsClefs[] = {
-  "SI", "SINON", "ALORS", "TANTQUE", "FAIRE", "ENTIER", "RETOUR", "LIRE", "ECRIRE"
+  "si", "sinon", "alors", "tantque", "faire", "entier", "retour", "lire", "ecrire"
 };
 
 int codeMotClefs[] = {
@@ -387,7 +387,10 @@ void nom_token( int token, char *nom, char *valeur ) {
   else if(token == ET) strcpy(valeur, "ET");
   else if(token == OU) strcpy(valeur, "OU");
   else if(token == NON) strcpy(valeur, "NON");
-  else if(token == FIN) strcpy(valeur, "FIN");
+  else if(token == FIN) {
+    strcpy(valeur, "FIN");
+    strcpy(yytext, "");
+  }
   else if(token == VIRGULE) strcpy(valeur, "VIRGULE");
 
   else if( token == ID_VAR ) {

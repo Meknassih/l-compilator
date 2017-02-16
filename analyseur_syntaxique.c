@@ -618,10 +618,8 @@ int main (int argc, char **argv) {
       }
       test_yylex_internal(yyin);
       return 0;
-    } else if (strcmp(argv[1],"-x") == 0) {
-      XML = 1;
     } else if (strcmp(argv[1],"-s") == 0) {
-
+      XML = 1;
     } else {
       fprintf(stderr, "Arguments incorrects\n");
       exit(1);
@@ -643,7 +641,8 @@ int main (int argc, char **argv) {
 
   uniteCourante=yylex();
   pg();
-  printf("SYN: Analyse syntaxique terminée avec succès\n");
+  if (!op1) //Pour ne pas interférer avec la sortie XML
+    printf("SYN: Analyse syntaxique terminée avec succès\n");
 
   return 0;
 }
