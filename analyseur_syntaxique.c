@@ -7,6 +7,7 @@
 #include "headers/analyseur_lexical.h"
 #include "headers/premiers.h"
 #include "headers/suivants.h"
+#include "headers/syntabs.h"
 
 short int uniteCourante;
 char yytext[100];
@@ -551,14 +552,18 @@ void neg(void) {
   affiche_balise_fermante("negation",XML);
 }
 
-void f(void) {
-  affiche_balise_ouvrante("facteur",XML);
+n_exp *f(void) {
+  n_exp *S2 = NULL;
+  n_appel *S1 = NULL;
+  n_var *S3 = NULL;
+  char *fct = "facteur";
+  affiche_balise_ouvrante(fct,XML);
   if (uniteCourante == PARENTHESE_OUVRANTE) {
     nom_token(uniteCourante, nom, valeur);
     affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_expression_, uniteCourante)) {
-      Exp();
+      S2 = Exp();
       if (uniteCourante == PARENTHESE_FERMANTE) {
         nom_token(uniteCourante, nom, valeur);
         affiche_element(nom, valeur, XML);
@@ -572,11 +577,14 @@ void f(void) {
   } else if (uniteCourante == NOMBRE) {
     nom_token(uniteCourante, nom, valeur);
     affiche_element(nom, valeur, XML);
+    S2 = cree_n_exp_entier(valeur);
     uniteCourante = yylex();
   } else if (est_premier(_appelFct_, uniteCourante)) {
-    appf();
+    S1 = appf();
+    S2 = cree_n_exp_appel(S1);
   } else if (est_premier(_var_, uniteCourante)) {
-    var();
+    S3 = var();
+    S2 = cree_n_exp_var(S3);
   } else if (uniteCourante == LIRE) {
     nom_token(uniteCourante, nom, valeur);
     affiche_element(nom, valeur, XML);
@@ -588,6 +596,7 @@ void f(void) {
       if (uniteCourante == PARENTHESE_FERMANTE) {
         nom_token(uniteCourante, nom, valeur);
         affiche_element(nom, valeur, XML);
+        S2 = cree_n_exp_lire();
         uniteCourante = yylex();
       } else {
         erreur("')' attendue après '('");
@@ -598,32 +607,40 @@ void f(void) {
   } else {
     erreur("Erreur de syntaxe");
   }
-  affiche_balise_fermante("facteur",XML);
+  affiche_balise_fermante(fct,XML);
+  return S2;
 }
 
-void var(void) {
-  affiche_balise_ouvrante("var",XML);
+n_var *var(void) {
+  n_var *SS = NULL;
+  n_exp *S3 = NULL;
+  char *fct = "var";
+  affiche_balise_ouvrante(fct,XML);
   if (uniteCourante == ID_VAR) {
     nom_token(uniteCourante, nom, valeur);
     affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_optIndice_, uniteCourante)) {
-      oind();
-    } else if (!est_suivant(_var_, uniteCourante)) {
-      erreur("Erreur de syntaxe");
+      S3 = oind();
+      SS = cree_n_var_indicee(nom, S3);
+    } else if (est_suivant(_var_, uniteCourante)) {
+      SS = cree_n_var_simple(nom);
     }
   }
-  affiche_balise_fermante("var",XML);
+  affiche_balise_fermante(fct,XML);
+  return SS;
 }
 
-void oind(void) {
-  affiche_balise_ouvrante("optIndice",XML);
+n_exp *oind(void) {
+  n_exp *S2 = NULL;
+  char *fct = "optIndice";
+  affiche_balise_ouvrante(fct,XML);
   if (uniteCourante == CROCHET_OUVRANT) {
     nom_token(uniteCourante, nom, valeur);
     affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_expression_, uniteCourante)) {
-      Exp();
+      S2 = Exp();
       if (uniteCourante == CROCHET_FERMANT) {
         nom_token(uniteCourante, nom, valeur);
         affiche_element(nom, valeur, XML);
@@ -637,25 +654,32 @@ void oind(void) {
   } else if (!est_suivant(_optIndice_, uniteCourante)) {
     erreur("Erreur de syntaxe");
   }
-  affiche_balise_fermante("optIndice",XML);
+  affiche_balise_fermante(fct,XML);
+  return S2;
 }
 
-void appf(void) {
-  affiche_balise_ouvrante("appelFct",XML);
+n_appel *appf(void) {
+  n_appel *SS = NULL;
+  n_l_exp *S2 = NULL;
+  char *nom_fct;
+  char *fct = "appelFct";
+  affiche_balise_ouvrante(fct,XML);
   if (uniteCourante == ID_FCT) {
     nom_token(uniteCourante, nom, valeur);
     affiche_element(nom, valeur, XML);
+    strcpy(nom_fct, nom);
     uniteCourante = yylex();
     if (uniteCourante == PARENTHESE_OUVRANTE) {
       nom_token(uniteCourante, nom, valeur);
       affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
       if (est_premier(_listeExpressions_, uniteCourante)) {
-        lexp();
+        S2 = lexp();
         if (uniteCourante == PARENTHESE_FERMANTE) {
           nom_token(uniteCourante, nom, valeur);
           affiche_element(nom, valeur, XML);
           uniteCourante = yylex();
+          SS = cree_n_appel(nom_fct, S2);
         } else {
           erreur("')' attendue");
         }
@@ -668,35 +692,47 @@ void appf(void) {
   } else {
     erreur("Erreur de syntaxe");
   }
-  affiche_balise_fermante("appelFct",XML);
+  affiche_balise_fermante(fct,XML);
+  return SS;
 }
 
-void lexp(void) {
-  affiche_balise_ouvrante("listeExpressions",XML);
+n_l_exp lexp(void) {
+  n_l_exp *SS = NULL;
+  n_exp *S2 = NULL;
+  n_l_exp *S3 = NULL;
+  char *fct="listeExpressions";
+  affiche_balise_ouvrante(fct,XML);
   if (est_premier(_expression_, uniteCourante)) {
-    Exp(); lexpB();
+    S2 = Exp(); S3 = lexpB();
+    SS = cree_n_l_exp(S2, S3);
   } else if(!est_suivant(_listeExpressions_, uniteCourante)) {
     erreur("Erreur de syntaxe");
   }
-  affiche_balise_fermante("listeExpressions",XML);
+  affiche_balise_fermante(fct,XML);
+  return SS;
 }
 
-void lexpB(void) {
-  affiche_balise_ouvrante("listeExpressionsBis",XML);
+n_l_exp *lexpB(void) {
+  n_l_exp *SS = NULL;
+  n_l_exp *S2 = NULL;
+  n_exp *S3 = NULL;
+  char *fct="listeExpressionsBis";
+  affiche_balise_ouvrante(fct,XML);
   if (uniteCourante == VIRGULE) {
     nom_token(uniteCourante, nom, valeur);
     affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_expression_, uniteCourante)) {
-      Exp(); lexpB();
+      S2 = Exp(); S3 = lexpB();
+      SS = cree_n_l_exp(S2, S3);
     } else {
       erreur("Expression attendue après ','");
     }
   } else if(!est_suivant(_listeExpressionsBis_, uniteCourante)) {
     erreur("Erreur de syntaxe");
   }
-
-  affiche_balise_fermante("listeExpressionsBis",XML);
+  return SS;
+  affiche_balise_fermante(fct,XML);
 }
 
 int main (int argc, char **argv) {
