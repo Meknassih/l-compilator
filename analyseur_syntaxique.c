@@ -66,6 +66,8 @@ void ldvb(void) {
 void dv(void) {
   affiche_balise_ouvrante("declarationVariable",XML);
   if (uniteCourante == ENTIER) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (uniteCourante == ID_VAR) {
       uniteCourante = yylex();
@@ -234,10 +236,14 @@ void li(void) {
 void isi(void) {
   affiche_balise_ouvrante("listeInstructions",XML);
   if (uniteCourante == SI) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_expression_, uniteCourante)) { //?
       Exp();
       if (uniteCourante == ALORS) {
+        nom_token(uniteCourante, nom, valeur);
+        affiche_element(nom, valeur, XML);
         uniteCourante = yylex();
         ib(); osinon();
       } else
@@ -253,6 +259,8 @@ void isi(void) {
 void osinon(void) {
   affiche_balise_ouvrante("optSinon",XML);
   if (uniteCourante == SINON) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     ib();
   } else if (!est_suivant(_optSinon_, uniteCourante)) {
@@ -264,9 +272,13 @@ void osinon(void) {
 void itq(void) {
   affiche_balise_ouvrante("instructionTantque",XML);
   if (uniteCourante == TANTQUE) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     Exp();
     if (uniteCourante == FAIRE) {
+      nom_token(uniteCourante, nom, valeur);
+      affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
       ib();
     } else
@@ -294,6 +306,8 @@ void iapp(void) {
 void iret(void) {
   affiche_balise_ouvrante("instructionRetour",XML);
   if (uniteCourante == RETOUR) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_expression_, uniteCourante)) {
       Exp();
@@ -312,6 +326,8 @@ void iret(void) {
 void iecr(void) {
   affiche_balise_ouvrante("instructionEcriture",XML);
   if (uniteCourante == ECRIRE) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (uniteCourante == PARENTHESE_OUVRANTE) {
       uniteCourante = yylex();
@@ -505,6 +521,8 @@ void f(void) {
   } else if (est_premier(_var_, uniteCourante)) {
     var();
   } else if (uniteCourante == LIRE) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (uniteCourante == PARENTHESE_OUVRANTE) {
       uniteCourante = yylex();
