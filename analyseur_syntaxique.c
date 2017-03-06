@@ -32,8 +32,11 @@ void odv(void)  {
   affiche_balise_ouvrante("optDecVariables",XML);
   if (est_premier(_listeDecVariables_, uniteCourante)) {
     ldv();
-    if (uniteCourante == POINT_VIRGULE)
+    if (uniteCourante == POINT_VIRGULE) {
+      nom_token(uniteCourante, nom, valeur);
+      affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
+    }
   } else if (!est_suivant(_optDecVariables_, uniteCourante))
     erreur("Erreur de syntaxe");
   affiche_balise_fermante("optDecVariables",XML);
@@ -51,6 +54,8 @@ void ldv(void) {
 void ldvb(void) {
   affiche_balise_ouvrante("listeDecVariablesBis",XML);
   if (uniteCourante == VIRGULE) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_declarationVariable_, uniteCourante)) {
       dv(); ldvb();
@@ -70,6 +75,8 @@ void dv(void) {
     affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (uniteCourante == ID_VAR) {
+      nom_token(uniteCourante, nom, valeur);
+      affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
       if (est_premier(_optTailleTableau_, uniteCourante)) {
         ott();
@@ -88,10 +95,16 @@ void dv(void) {
 void ott(void) {
   affiche_balise_ouvrante("optTailleTableau",XML);
   if (uniteCourante == CROCHET_OUVRANT) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (uniteCourante == NOMBRE) {
+      nom_token(uniteCourante, nom, valeur);
+      affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
       if (uniteCourante == CROCHET_FERMANT) {
+        nom_token(uniteCourante, nom, valeur);
+        affiche_element(nom, valeur, XML);
         uniteCourante = yylex();
       } else
         erreur("Crochet fermant attendu après indice de tableau");
@@ -116,6 +129,8 @@ void ldf(void) {
 void df(void) {
   affiche_balise_ouvrante("declarationFonction",XML);
   if (uniteCourante == ID_FCT) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_listeParam_, uniteCourante)) {
       lp(); odv(); ib();
@@ -130,6 +145,8 @@ void df(void) {
 void lp(void) {
   affiche_balise_ouvrante("listeParam",XML);
   if (uniteCourante == PARENTHESE_OUVRANTE) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_optListeDecVariables_, uniteCourante)) {
       oldv();
@@ -137,6 +154,8 @@ void lp(void) {
       erreur("Erreur de syntaxe");
     }
     if (uniteCourante == PARENTHESE_FERMANTE) {
+      nom_token(uniteCourante, nom, valeur);
+      affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
     } else
       erreur("Parenthèse fermante attendue à la fin de la liste de paramètres");
@@ -184,6 +203,8 @@ void iaff(void) {
   if (est_premier(_var_, uniteCourante)) {
     var();
     if (uniteCourante == EGAL) {
+      nom_token(uniteCourante, nom, valeur);
+      affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
       if (est_premier(_expression_, uniteCourante)) {
         Exp();
@@ -191,6 +212,8 @@ void iaff(void) {
         erreur("Expression attendue après '='");
       }
       if (uniteCourante == POINT_VIRGULE) {
+        nom_token(uniteCourante, nom, valeur);
+        affiche_element(nom, valeur, XML);
         uniteCourante = yylex();
       } else
         erreur("';' manquant");
@@ -206,6 +229,8 @@ void iaff(void) {
 void ib(void) {
   affiche_balise_ouvrante("instructionBloc",XML);
   if (uniteCourante == ACCOLADE_OUVRANTE) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_listeInstructions_, uniteCourante)) {
       li();
@@ -213,6 +238,8 @@ void ib(void) {
       erreur("Erreur de syntaxe");
     }
     if (uniteCourante == ACCOLADE_FERMANTE) {
+      nom_token(uniteCourante, nom, valeur);
+      affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
     } else {
       erreur("Accolade fermante manquante");
@@ -294,6 +321,8 @@ void iapp(void) {
   if (est_premier(_appelFct_, uniteCourante)) {
     appf();
     if (uniteCourante == POINT_VIRGULE) {
+      nom_token(uniteCourante, nom, valeur);
+      affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
     } else
       erreur("';' manquant");
@@ -312,6 +341,8 @@ void iret(void) {
     if (est_premier(_expression_, uniteCourante)) {
       Exp();
       if (uniteCourante == POINT_VIRGULE) {
+        nom_token(uniteCourante, nom, valeur);
+        affiche_element(nom, valeur, XML);
         uniteCourante = yylex();
       } else {
         erreur("';' manquant");
@@ -330,12 +361,18 @@ void iecr(void) {
     affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (uniteCourante == PARENTHESE_OUVRANTE) {
+      nom_token(uniteCourante, nom, valeur);
+      affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
       if (est_premier(_expression_, uniteCourante)) {
         Exp();
         if (uniteCourante == PARENTHESE_FERMANTE) {
+          nom_token(uniteCourante, nom, valeur);
+          affiche_element(nom, valeur, XML);
           uniteCourante = yylex();
           if (uniteCourante == POINT_VIRGULE) {
+            nom_token(uniteCourante, nom, valeur);
+            affiche_element(nom, valeur, XML);
             uniteCourante = yylex();
           } else
             erreur("';' manquant");
@@ -354,6 +391,8 @@ void iecr(void) {
 void ivide(void) {
   affiche_balise_ouvrante("instructionVide",XML);
   if (uniteCourante == POINT_VIRGULE) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
   } else
     erreur("Erreur de syntaxe");
@@ -373,6 +412,8 @@ void Exp(void) {
 void expB(void) {
   affiche_balise_ouvrante("expressionBis",XML);
   if (uniteCourante == OU) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_conjonction_, uniteCourante)) {
       Conj(); expB();
@@ -397,6 +438,8 @@ void Conj(void) {
 void conjB(void) {
   affiche_balise_ouvrante("conjonctionBis",XML);
   if (uniteCourante == ET) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_comparaison_, uniteCourante)) {
       comp(); conjB();
@@ -421,6 +464,8 @@ void comp(void) {
 void compB(void) {
   affiche_balise_ouvrante("comparaisonBis",XML);
   if (uniteCourante == EGAL || uniteCourante == INFERIEUR) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_expArith_, uniteCourante)) {
       e(); compB();
@@ -446,6 +491,8 @@ void e(void) {
 void eB(void) {
   affiche_balise_ouvrante("expArithBis",XML);
   if (uniteCourante == PLUS || uniteCourante == MOINS) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_terme_, uniteCourante)) {
       t(); eB();
@@ -471,6 +518,8 @@ void t(void) {
 void tB(void) {
   affiche_balise_ouvrante("termeBis",XML);
   if (uniteCourante == FOIS || uniteCourante == DIVISE) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_negation_, uniteCourante)) {
       neg(); tB();
@@ -486,6 +535,8 @@ void tB(void) {
 void neg(void) {
   affiche_balise_ouvrante("negation",XML);
   if (uniteCourante == NON) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_negation_, uniteCourante)) {
       neg();
@@ -503,10 +554,14 @@ void neg(void) {
 void f(void) {
   affiche_balise_ouvrante("facteur",XML);
   if (uniteCourante == PARENTHESE_OUVRANTE) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_expression_, uniteCourante)) {
       Exp();
       if (uniteCourante == PARENTHESE_FERMANTE) {
+        nom_token(uniteCourante, nom, valeur);
+        affiche_element(nom, valeur, XML);
         uniteCourante = yylex();
       } else {
         erreur("')' attendue après expression");
@@ -515,6 +570,8 @@ void f(void) {
       erreur("Expression attendue après '('");
     }
   } else if (uniteCourante == NOMBRE) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
   } else if (est_premier(_appelFct_, uniteCourante)) {
     appf();
@@ -525,8 +582,12 @@ void f(void) {
     affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (uniteCourante == PARENTHESE_OUVRANTE) {
+      nom_token(uniteCourante, nom, valeur);
+      affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
       if (uniteCourante == PARENTHESE_FERMANTE) {
+        nom_token(uniteCourante, nom, valeur);
+        affiche_element(nom, valeur, XML);
         uniteCourante = yylex();
       } else {
         erreur("')' attendue après '('");
@@ -543,6 +604,8 @@ void f(void) {
 void var(void) {
   affiche_balise_ouvrante("var",XML);
   if (uniteCourante == ID_VAR) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_optIndice_, uniteCourante)) {
       oind();
@@ -556,10 +619,14 @@ void var(void) {
 void oind(void) {
   affiche_balise_ouvrante("optIndice",XML);
   if (uniteCourante == CROCHET_OUVRANT) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_expression_, uniteCourante)) {
       Exp();
       if (uniteCourante == CROCHET_FERMANT) {
+        nom_token(uniteCourante, nom, valeur);
+        affiche_element(nom, valeur, XML);
         uniteCourante = yylex();
       } else {
         erreur("']' attendu après expression");
@@ -576,12 +643,18 @@ void oind(void) {
 void appf(void) {
   affiche_balise_ouvrante("appelFct",XML);
   if (uniteCourante == ID_FCT) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (uniteCourante == PARENTHESE_OUVRANTE) {
+      nom_token(uniteCourante, nom, valeur);
+      affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
       if (est_premier(_listeExpressions_, uniteCourante)) {
         lexp();
         if (uniteCourante == PARENTHESE_FERMANTE) {
+          nom_token(uniteCourante, nom, valeur);
+          affiche_element(nom, valeur, XML);
           uniteCourante = yylex();
         } else {
           erreur("')' attendue");
@@ -611,6 +684,8 @@ void lexp(void) {
 void lexpB(void) {
   affiche_balise_ouvrante("listeExpressionsBis",XML);
   if (uniteCourante == VIRGULE) {
+    nom_token(uniteCourante, nom, valeur);
+    affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     if (est_premier(_expression_, uniteCourante)) {
       Exp(); lexpB();
