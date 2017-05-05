@@ -18,13 +18,7 @@ int XML = 0;
 
 void pg(void) { //Axiome
   affiche_balise_ouvrante("programme",XML);
-  if (est_premier(_optDecVariables_, uniteCourante)) {
-    odv(); ldf();
-  } else if (est_premier(_listeDecFonctions_, uniteCourante)) {
-    ldf();
-  } else if (!est_suivant(_programme_, uniteCourante)) {
-    erreur("Erreur de syntaxe");
-  }
+  odv(); ldf();
   affiche_balise_fermante("programme",XML);
   return;
 }
@@ -38,8 +32,7 @@ void odv(void)  {
       affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
     }
-  } else if (!est_suivant(_optDecVariables_, uniteCourante))
-    erreur("Erreur de syntaxe");
+  }
   affiche_balise_fermante("optDecVariables",XML);
 }
 
@@ -48,7 +41,7 @@ void ldv(void) {
   if (est_premier(_declarationVariable_, uniteCourante)) {
     dv(); ldvb();
   } else
-    erreur("Erreur de syntaxe");
+    erreur("Erreur de syntaxe 2 ");
   affiche_balise_fermante("listeDecVariables",XML);
 }
 
@@ -79,11 +72,7 @@ void dv(void) {
       nom_token(uniteCourante, nom, valeur);
       affiche_element(nom, valeur, XML);
       uniteCourante = yylex();
-      if (est_premier(_optTailleTableau_, uniteCourante)) {
-        ott();
-      } else if (!est_suivant(_declarationVariable_, uniteCourante)) {
-        erreur("Erreur de syntaxe : n'est pas suivant");
-      }
+      ott();
     } else {
       erreur("Identifiant de variable attendu après ENTIER");
     }
@@ -111,8 +100,6 @@ void ott(void) {
         erreur("Crochet fermant attendu après indice de tableau");
     } else
       erreur("Indince de tableau attendu après crochet ouvrant");
-  } else if (!est_suivant(_optTailleTableau_, uniteCourante)) {
-    erreur("Erreur de syntaxe");
   }
   affiche_balise_fermante("optTailleTableau",XML);
 }
@@ -121,8 +108,6 @@ void ldf(void) {
   affiche_balise_ouvrante("listeDecFonctions",XML);
   if (est_premier(_declarationFonction_, uniteCourante)) {
     df(); ldf();
-  } else if (!est_suivant(_listeDecFonctions_, uniteCourante)) {
-    erreur("Erreur de syntaxe");
   }
   affiche_balise_fermante("listeDecFonctions",XML);
 }
@@ -149,11 +134,7 @@ void lp(void) {
     nom_token(uniteCourante, nom, valeur);
     affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
-    if (est_premier(_optListeDecVariables_, uniteCourante)) {
-      oldv();
-    } else if (!est_suivant(_optListeDecVariables_, uniteCourante)) {
-      erreur("Erreur de syntaxe");
-    }
+    oldv();
     if (uniteCourante == PARENTHESE_FERMANTE) {
       nom_token(uniteCourante, nom, valeur);
       affiche_element(nom, valeur, XML);
@@ -169,8 +150,6 @@ void oldv(void) {
   affiche_balise_ouvrante("optListeDecVariables",XML);
   if (est_premier(_listeDecVariables_, uniteCourante)) {
     ldv();
-  } else if (!est_suivant(_optListeDecVariables_, uniteCourante)) {
-    erreur("Erreur de syntaxe");
   }
   affiche_balise_fermante("optListeDecVariables",XML);
 }
@@ -233,11 +212,7 @@ void ib(void) {
     nom_token(uniteCourante, nom, valeur);
     affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
-    if (est_premier(_listeInstructions_, uniteCourante)) {
-      li();
-    } else {
-      erreur("Erreur de syntaxe");
-    }
+    li();
     if (uniteCourante == ACCOLADE_FERMANTE) {
       nom_token(uniteCourante, nom, valeur);
       affiche_element(nom, valeur, XML);
@@ -255,14 +230,12 @@ void li(void) {
   affiche_balise_ouvrante("listeInstructions",XML);
   if (est_premier(_instruction_, uniteCourante)) {
     i(); li();
-  } else if (!est_suivant(_listeInstructions_, uniteCourante)) {
-    erreur("Erreur de syntaxe");
   }
   affiche_balise_fermante("listeInstructions",XML);
 }
 //USE est_premier() ABOVE THIS COMMENT
 void isi(void) {
-  affiche_balise_ouvrante("listeInstructions",XML);
+  affiche_balise_ouvrante("instructionSi",XML);
   if (uniteCourante == SI) {
     nom_token(uniteCourante, nom, valeur);
     affiche_element(nom, valeur, XML);
@@ -281,7 +254,7 @@ void isi(void) {
   } else
     erreur("Erreur de syntaxe");
 
-  affiche_balise_fermante("listeInstructions",XML);
+  affiche_balise_fermante("instructionSi",XML);
 }
 
 void osinon(void) {
@@ -291,8 +264,6 @@ void osinon(void) {
     affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
     ib();
-  } else if (!est_suivant(_optSinon_, uniteCourante)) {
-    erreur("Erreur de syntaxe");
   }
   affiche_balise_fermante("optSinon",XML);
 }
@@ -421,8 +392,6 @@ void expB(void) {
     } else {
       erreur("Conjonction attendue après '|'");
     }
-  } else if (!est_suivant(_expressionBis_, uniteCourante)) {
-    erreur("Erreur de syntaxe");
   }
   affiche_balise_fermante("expressionBis",XML);
 }
@@ -447,8 +416,6 @@ void conjB(void) {
     } else {
       erreur("Comparaison attendue après '&'");
     }
-  } else if (!est_suivant(_expressionBis_, uniteCourante)) {
-    erreur("Erreur de syntaxe");
   }
   affiche_balise_fermante("conjonctionBis",XML);
 }
@@ -473,8 +440,6 @@ void compB(void) {
     } else {
       erreur("Expression arithmétique attendue après '=' ou '<'");
     }
-  } else if (!est_suivant(_comparaisonBis_, uniteCourante)) {
-    erreur("Erreur de syntaxe");
   }
   affiche_balise_fermante("comparaisonBis",XML);
 }
@@ -500,8 +465,6 @@ void eB(void) {
     } else {
       erreur("Terme attendu après '+' ou '-'");
     }
-  } else if (!est_suivant(_expArithBis_, uniteCourante)) {
-    erreur("Erreur de syntaxe");
   }
   affiche_balise_fermante("expArithBis",XML);
 }
@@ -527,8 +490,6 @@ void tB(void) {
     } else {
       erreur("Terme attendu après '*' ou '/'");
     }
-  } else if (!est_suivant(_termeBis_, uniteCourante)) {
-    erreur("Erreur de syntaxe");
   }
   affiche_balise_fermante("termeBis",XML);
 }
@@ -651,8 +612,6 @@ n_exp *oind(void) {
     } else {
       erreur("Expression attendue après '['");
     }
-  } else if (!est_suivant(_optIndice_, uniteCourante)) {
-    erreur("Erreur de syntaxe");
   }
   affiche_balise_fermante(fct,XML);
   return S2;
@@ -684,7 +643,7 @@ n_appel *appf(void) {
           erreur("')' attendue");
         }
       } else {
-        erreur("Erreur de syntaxe");
+        erreur("')' attendue");
       }
     } else {
       erreur("'(' attendue");
