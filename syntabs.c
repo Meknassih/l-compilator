@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include"util.h"
-#include"syntabs.h"
+#include"headers/util.h"
+#include"headers/syntabs.h"
 
 n_appel *cree_n_appel(char *fonction, n_l_exp *args)
 {
@@ -221,4 +221,3 @@ n_l_dec *cree_n_l_dec(n_dec *tete, n_l_dec *queue)
   n->queue = queue;
   return n;
 }
-
