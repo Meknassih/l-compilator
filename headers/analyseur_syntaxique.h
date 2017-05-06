@@ -42,5 +42,4 @@ n_exp *oind();
 n_appel *appf();
 n_l_exp *lexp();
 n_l_exp *lexpB();
-void iff();
 #endif

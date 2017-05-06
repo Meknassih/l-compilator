@@ -946,45 +946,44 @@ n_appel *appf(void) {
   return SS;
 }
 
+//refaite
 n_l_exp * lexp(void) {
-  n_l_exp *SS = NULL;
-  n_exp *S2 = NULL;
-  n_l_exp *S3 = NULL;
-  char *fct="listeExpressions";
-  affiche_balise_ouvrante(fct,XML);
+  n_exp *S1 = NULL;
+  n_l_exp *S2 = NULL;
+  affiche_balise_ouvrante("listeExpressions",XML);
+
   if (est_premier(_expression_, uniteCourante)) {
-    S2 = Exp(); S3 = lexpB();
-    SS = cree_n_l_exp(S2, S3);
-  } else if(!est_suivant(_listeExpressions_, uniteCourante)) {
+    S1 = Exp();
+    S2 = lexpB(S1);
+  } else if(!est_suivant(uniteCourante, _listeExpressions_)) {
     erreur("Erreur de syntaxe");
   }
-  affiche_balise_fermante(fct,XML);
-  return SS;
+
+  affiche_balise_fermante("listeExpressions",XML);
+  return S2;
 }
 
-n_l_exp * lexpB(void) {
+n_l_exp * lexpB(n_exp *herite) {
   n_l_exp *SS = NULL;
-  n_exp *S2 = NULL;
-  n_l_exp *S3 = NULL;
+  n_exp *S1 = NULL;
+  n_l_exp *S2 = NULL;
+  affiche_balise_ouvrante("listeExpressionsBis",XML);
 
-  char *fct="listeExpressionsBis";
-  affiche_balise_ouvrante(fct,XML);
   if (uniteCourante == VIRGULE) {
     nom_token(uniteCourante, nom, valeur);
     affiche_element(nom, valeur, XML);
     uniteCourante = yylex();
-    if (est_premier(_expression_, uniteCourante)) {
-      S2 = Exp();
-      S3 = lexpB();
-      SS = cree_n_l_exp(S2, S3);
-    } else {
-      erreur("Expression attendue après ','");
-    }
-  } else if(!est_suivant(_listeExpressionsBis_, uniteCourante)) {
-    erreur("Erreur de syntaxe");
+    S1 = Exp();
+    S2 = lexpB(S1);
+    SS = cree_n_l_exp(S1, S2);
+  } else if(est_suivant(_listeExpressionsBis_, uniteCourante)) {
+    SS = cree_n_l_exp(herite,NULL);
+  } else {
+      erreur("Erreur de syntaxe");
   }
+
+  affiche_balise_fermante("listeExpressionsBis",XML);
   return SS;
-  affiche_balise_fermante(fct,XML);
 }
 
 int main (int argc, char **argv) {
